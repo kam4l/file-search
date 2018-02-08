@@ -1,0 +1,53 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+// Use Java 7 by default
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+// UTF-8 should be standard by now. So use it!
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+// The main class of the application
+mainClassName = 'com.search.files.FileSearchApplication'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+// Set our project variables
+project.ext {
+    dropwizardVersion = '1.1.4'
+    mockito = '2.7.22'
+    junit = '4.12'
+    swagger = '1.1.0-1'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile (
+       'io.dropwizard:dropwizard-core:' + dropwizardVersion,
+       'com.smoketurner:dropwizard-swagger:' + swagger
+    )
+
+    testCompile(
+            'org.mockito:mockito-core:' + mockito,
+            'junit:junit:'+ junit,
+            'io.dropwizard:dropwizard-testing:1.1.0'
+    )
+}
+
+// Configure the run task to start the Dropwizard service
+run {
+    args 'server', './src/dist/config/filesearch.yml'
+
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.1'
+}

@@ -1,0 +1,12 @@
+searchPath: /src/test/resources/FileSearchDirectory
+
+swagger:
+  resourcePackage: com.search.files.resources
+
+server:
+  applicationConnectors:
+    - type: http
+      port: 8787
+  adminConnectors:
+    - type: http
+      port: 8788
