@@ -53,4 +53,12 @@ public class FileSearchServiceTest {
         assertEquals(files.size(), 0);
     }
 
+    @Test
+    public void findWholeWordsOnly() throws Exception {
+        //when
+        List<String> files = new FileSearchService(searchPath).findFiles(Collections.singletonList("testFile"));
+
+        //then
+        assertEquals(files.size(), 0);
+    }
 }

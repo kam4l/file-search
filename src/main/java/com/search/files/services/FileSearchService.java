@@ -9,6 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class FileSearchService {
@@ -23,17 +25,14 @@ public class FileSearchService {
     public List<String> findFiles(List<String> words) {
         try {
             return Files.walk(Paths.get(searchPath))
-                    .filter(foundPath -> {
+                    .filter(foundPath -> foundPath.toFile().isFile() && words.parallelStream().allMatch(word -> {
                         try {
-                            if (foundPath.toFile().isFile())
-                                return words.parallelStream().allMatch(new String(Files.readAllBytes(foundPath), "UTF-8")::contains);
-
+                            return containsWholeWord(new String(Files.readAllBytes(foundPath), "UTF-8"), word);
                         } catch (IOException e) {
                             LOGGER.error("Unexpected Exception occurred: ", e);
                             throw new FileSearchException(e);
                         }
-                        return false;
-                    })
+                    }))
                     .map(Path::toString)
                     .sorted()
                     .collect(Collectors.toList());
@@ -41,8 +40,12 @@ public class FileSearchService {
             LOGGER.error("Unexcepted Exception occurred:", e);
             throw new FileSearchException(e);
         }
-
-
     }
 
+    private boolean containsWholeWord(String file, String word) {
+        String pattern = "\\b" + word + "\\b";
+        Pattern p = Pattern.compile(pattern);
+        Matcher m = p.matcher(file);
+        return m.find();
+    }
 }
